@@ -1,3 +1,5 @@
+// 2012-10-18-2011
+
 //#####################################################################
 /*
 A quick program to to posotion the stage of the SEM, take data, and 
@@ -12,6 +14,8 @@ int pin_scan_y                  = 10; // This sets up out y position pin
       int pin_blanking          = 1; 
 const int pin_blanking_on       = LOW;
 const int pin_blanking_off      = HIGH;
+void  blanking_on(  void );
+void  blanking_off( void );
 
 // Variables
 volatile int sensorValue        = 0; // Initializing our sensor value variable 
@@ -31,6 +35,46 @@ volatile int scan_y_step        = 1; // Our y step size for our position stage
 //volatile int blanking = HIGH;
 
 //#####################################################################
+//#####################################################################
+// sensorValue = video_read(); // analogRead(pin_sensor);
+
+int video_read( void )
+{
+    analogRead(pin_sensor); // Arduino
+}
+//#####################################################################
+void  blanking_on(  void )
+{
+	digitalWrite( pin_blanking , pin_blanking_on ); // Arduino
+}
+//--------------------------------
+void  blanking_off( void )
+{
+	digitalWrite( pin_blanking , pin_blanking_off ); // Arduino
+}
+//#####################################################################
+// scan_x_set( x ); //analogWrite(pin_scan_x, x); // Move the stage to x
+
+void scan_x_set( int x )
+{
+	analogWrite( pin_scan_x, x ); // Arduino
+}
+//-------------------
+// scan_y_set( y ); //analogWrite(pin_scan_y, y); // Move the stage to y
+
+void scan_y_set( int y)
+{
+	analogWrite( pin_scan_y, y ); // Arduino
+}
+//#####################################################################
+// delay_ms( settle_y_ms ); // delay(settle_y_ms);
+
+void delay_ms( int ms )
+{
+	delay( ms ); // Arduino
+}
+//#####################################################################
+//#####################################################################
 
 void setup() 
 {// This is treated as out main() function for now
@@ -39,18 +83,19 @@ void setup()
 //	pinMode(pin_sensor, INPUT);  // Might be importaint %TODO%
 
 
-	pinMode(      pin_blanking, OUTPUT );	
-	digitalWrite( pin_blanking, pin_blanking_on   );
+	pinMode(      pin_blanking, OUTPUT );
+	blanking_on(); // digitalWrite( pin_blanking, pin_blanking_on   );
 	
 	Serial.begin(9600);  //Sets up a serial output to our computer at 9600 bps
-	
-	delay(settle_initial_ms); // Wait an initial ammount of time before starting
-	
+
+	delay_ms( settle_initial_ms ); // delay(settle_initial_ms); // Wait an initial ammount of time before starting
+
 	// This puts usinto the correct position, and settles before beginig our loop
-	analogWrite(pin_scan_x, scan_x_start);
-	analogWrite(pin_scan_y, scan_y_start);
-	delay(settle_retrace_x_ms);
-	delay(settle_retrace_y_ms);
+	scan_x_set( scan_x_start ); // analogWrite(pin_scan_x, scan_x_start);
+	scan_y_set( scan_y_start ); // analogWrite(pin_scan_y, scan_y_start);
+
+	delay_ms( settle_retrace_x_ms ); // delay(settle_retrace_x_ms);
+	delay_ms( settle_retrace_y_ms ); // delay(settle_retrace_y_ms);
 	
 	Serial.print("Seconds, Hexfrac, Board_ID, Rec_Null, \r\n");
 	Serial.print("Seconds, Hexfrac, Board_ID, Rec_Null, \r\n"); 
@@ -58,8 +103,8 @@ void setup()
 	Serial.print("Seconds, Hexfrac, Board_ID, Rec_Scan_Start, \r\n");
 	
 	
-	for (int y = scan_y_start ; y <= scan_y_stop ; y +=scan_y_step)
-		{  // Outerloop(y)
+	for( int y = scan_y_start ; y <= scan_y_stop ; y +=scan_y_step )
+		{  // Outer loop (y)
 			
 		Serial.print("Seconds, "); 
 		Serial.print("Hexfrac, "); 
@@ -68,19 +113,19 @@ void setup()
 		Serial.print(y);
 		Serial.print(", Bloop"); // Send the value to the computer
 		
-		analogWrite(pin_scan_y, y); // Move the state to t
-		delay(settle_y_ms);
+		scan_y_set( y ); // analogWrite(pin_scan_y, y); // Move the state to t
+		delay_ms( settle_y_ms ); // delay(settle_y_ms);
 		
-		digitalWrite(pin_blanking, pin_blanking_off);
+		blanking_off();
 		for (int x = scan_x_start ; x <= scan_x_stop ; x +=scan_x_step)
-			{ // Innerloop(x)
-			analogWrite(pin_scan_x, x); // Move the stage to x
+			{ // Inner loop (x)
+		    scan_x_set( x ); // analogWrite(pin_scan_x, x); // Move the stage to x
 			delay(settle_x_ms); // Wait for the motion to settle
-			sensorValue = analogRead(pin_sensor); // Read the image signal
+			sensorValue = video_read(); // analogRead(pin_sensor);
 			Serial.print(", "); // Send the value to the computer
 			Serial.print(sensorValue); // Send the value to the computer
 			}
-		digitalWrite(pin_blanking, pin_blanking_on);
+		blanking_on();
 		
 		Serial.print("\r\n");  // Prints a new line when we move y
 		
