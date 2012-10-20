@@ -1,0 +1,298 @@
+(* Content-type: application/mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 7.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       145,          7]
+NotebookDataLength[      8696,        289]
+NotebookOptionsPosition[      7259,        235]
+NotebookOutlinePosition[      7604,        250]
+CellTagsIndexPosition[      7561,        247]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["Procedural File loading", "Section",
+ CellChangeTimes->{{3.491196029595491*^9, 3.4911960350188093`*^9}}],
+
+Cell[CellGroupData[{
+
+Cell["Working directory details", "Subsection",
+ CellChangeTimes->{{3.491196322627571*^9, 3.491196326707367*^9}}],
+
+Cell["\<\
+Set the working directory such that all file paths are relative to the \
+location of the notebook.\
+\>", "Text",
+ CellChangeTimes->{{3.4911960506178617`*^9, 3.491196075446355*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"SetDirectory", "[", 
+  RowBox[{"NotebookDirectory", "[", "]"}], "]"}]], "Input",
+ CellChangeTimes->{{3.49119601534552*^9, 3.491196024959803*^9}, 
+   3.491196081723276*^9}],
+
+Cell[BoxData["\<\"C:\\\\Users\\\\Bret\\\\Desktop\\\\Lock-in Test\"\>"], \
+"Output",
+ CellChangeTimes->{
+  3.4911961032937593`*^9, {3.49123931873318*^9, 3.491239322399186*^9}}]
+}, Open  ]],
+
+Cell["\<\
+Now all files can be references relative to the location of the notebook.  \
+This works well when storing the notebook just above a structured set of \
+directories of data.  \
+\>", "Text",
+ CellChangeTimes->{{3.4911963309082527`*^9, 3.491196384620061*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["File path construction", "Subsection",
+ CellChangeTimes->{{3.491239203620578*^9, 3.49123922209101*^9}}],
+
+Cell["Enter the range of data files you would like to load", "Text",
+ CellChangeTimes->{{3.4912392246182146`*^9, 3.4912392465050535`*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"min", "=", "1"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"max", "=", "5"}], ";"}]}], "Input",
+ CellChangeTimes->{{3.491239002477024*^9, 3.4912390156122475`*^9}}],
+
+Cell["Enter some details about how to construct the path names", "Text",
+ CellChangeTimes->{{3.4912392499370594`*^9, 3.4912392591254754`*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"seg1", "=", "\"\<Data/Runs/run\>\""}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"seg2", "=", "\"\<Data/Headers/run\>\""}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"seg3", "=", "\"\<header\>\""}], ";"}]}], "Input",
+ CellChangeTimes->{{3.49123884057994*^9, 3.4912388579583707`*^9}, {
+  3.4912389128080673`*^9, 3.491238981760188*^9}}],
+
+Cell["\<\
+Use a table to generate a list of pathnames, and give that list a name.  \
+Watch out for data type inconsistencies.  You want these to be strings.\
+\>", "Text",
+ CellChangeTimes->{{3.491239267050289*^9, 3.4912393083591623`*^9}, 
+   3.491239558366201*^9}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"datapaths", "=", 
+   RowBox[{"Table", "[", 
+    RowBox[{
+     RowBox[{"seg1", "<>", 
+      RowBox[{"ToString", "[", "i", "]"}]}], ",", 
+     RowBox[{"{", 
+      RowBox[{"i", ",", "min", ",", "max"}], "}"}]}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{"TableForm", "[", "datapaths", "]"}]}], "Input",
+ CellChangeTimes->{{3.491238863730381*^9, 3.491238896958439*^9}, {
+  3.491238992040606*^9, 3.491239029383872*^9}, {3.491239078352358*^9, 
+  3.4912390997243958`*^9}}],
+
+Cell[BoxData[
+ TagBox[
+  TagBox[GridBox[{
+     {"\<\"Data/Runs/run1\"\>"},
+     {"\<\"Data/Runs/run2\"\>"},
+     {"\<\"Data/Runs/run3\"\>"},
+     {"\<\"Data/Runs/run4\"\>"},
+     {"\<\"Data/Runs/run5\"\>"}
+    },
+    GridBoxAlignment->{
+     "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+      "RowsIndexed" -> {}},
+    GridBoxSpacings->{"Columns" -> {
+        Offset[0.27999999999999997`], {
+         Offset[0.5599999999999999]}, 
+        Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+        Offset[0.2], {
+         Offset[0.4]}, 
+        Offset[0.2]}, "RowsIndexed" -> {}}],
+   Column],
+  Function[BoxForm`e$, 
+   TableForm[BoxForm`e$]]]], "Output",
+ CellChangeTimes->{{3.491239084030768*^9, 3.491239100551197*^9}, 
+   3.491239322477187*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"headerpaths", "=", 
+   RowBox[{"Table", "[", 
+    RowBox[{
+     RowBox[{"seg2", "<>", 
+      RowBox[{"ToString", "[", "i", "]"}], "<>", "seg3"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"i", ",", "min", ",", "max"}], "}"}]}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{"TableForm", "[", "headerpaths", "]"}]}], "Input",
+ CellChangeTimes->{{3.4912391338884554`*^9, 3.491239179190935*^9}}],
+
+Cell[BoxData[
+ TagBox[
+  TagBox[GridBox[{
+     {"\<\"Data/Headers/run1header\"\>"},
+     {"\<\"Data/Headers/run2header\"\>"},
+     {"\<\"Data/Headers/run3header\"\>"},
+     {"\<\"Data/Headers/run4header\"\>"},
+     {"\<\"Data/Headers/run5header\"\>"}
+    },
+    GridBoxAlignment->{
+     "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+      "RowsIndexed" -> {}},
+    GridBoxSpacings->{"Columns" -> {
+        Offset[0.27999999999999997`], {
+         Offset[0.5599999999999999]}, 
+        Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+        Offset[0.2], {
+         Offset[0.4]}, 
+        Offset[0.2]}, "RowsIndexed" -> {}}],
+   Column],
+  Function[BoxForm`e$, 
+   TableForm[BoxForm`e$]]]], "Output",
+ CellChangeTimes->{{3.4912391708761206`*^9, 3.491239179471736*^9}, 
+   3.491239322492787*^9}]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Addressing the path names", "Subsection",
+ CellChangeTimes->{{3.4912393963745165`*^9, 3.491239403597329*^9}}],
+
+Cell["\<\
+You can now pull up the different path strings by calling the different parts \
+of the list\
+\>", "Text",
+ CellChangeTimes->{{3.4912394071229353`*^9, 3.4912394550150194`*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{"datapaths", "[", 
+  RowBox[{"[", "3", "]"}], "]"}], "\[IndentingNewLine]", 
+ RowBox[{"headerpaths", "[", 
+  RowBox[{"[", "3", "]"}], "]"}]}], "Input",
+ CellChangeTimes->{{3.491239458821426*^9, 3.4912394644062357`*^9}}],
+
+Cell[BoxData["\<\"Data/Runs/run3\"\>"], "Output",
+ CellChangeTimes->{3.491239464733836*^9}],
+
+Cell[BoxData["\<\"Data/Headers/run3header\"\>"], "Output",
+ CellChangeTimes->{3.4912394647494364`*^9}]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Example Reading data.", "Subsection",
+ CellChangeTimes->{{3.491239624335493*^9, 3.491239639071336*^9}}],
+
+Cell["\<\
+You could use a loop or table to automate this as well for multiple runs.\
+\>", "Text",
+ CellChangeTimes->{{3.4912396421595125`*^9, 3.4912396697430897`*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"baddat1", "=", 
+   RowBox[{"ReadList", "[", 
+    RowBox[{
+     RowBox[{"datapaths", "[", 
+      RowBox[{"[", "1", "]"}], "]"}], ",", 
+     RowBox[{"Table", "[", 
+      RowBox[{"Number", ",", 
+       RowBox[{"{", "3", "}"}]}], "]"}]}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"dat1", "=", "baddat1"}], ";"}]}], "Input",
+ CellChangeTimes->{{3.4912395987690306`*^9, 3.4912396081445665`*^9}}]
+}, Open  ]]
+}, Open  ]]
+},
+WindowSize->{781, 817},
+WindowMargins->{{Automatic, 67}, {32, Automatic}},
+FrontEndVersion->"7.0 for Microsoft Windows (64-bit) (February 18, 2009)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[567, 22, 110, 1, 71, "Section"],
+Cell[CellGroupData[{
+Cell[702, 27, 113, 1, 36, "Subsection"],
+Cell[818, 30, 190, 4, 29, "Text"],
+Cell[CellGroupData[{
+Cell[1033, 38, 195, 4, 31, "Input"],
+Cell[1231, 44, 175, 3, 30, "Output"]
+}, Open  ]],
+Cell[1421, 50, 266, 5, 47, "Text"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[1724, 60, 109, 1, 36, "Subsection"],
+Cell[1836, 63, 138, 1, 29, "Text"],
+Cell[1977, 66, 209, 5, 52, "Input"],
+Cell[2189, 73, 142, 1, 29, "Text"],
+Cell[2334, 76, 394, 10, 72, "Input"],
+Cell[2731, 88, 264, 5, 47, "Text"],
+Cell[CellGroupData[{
+Cell[3020, 97, 511, 13, 52, "Input"],
+Cell[3534, 112, 791, 23, 101, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[4362, 140, 431, 11, 52, "Input"],
+Cell[4796, 153, 838, 23, 101, "Output"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[5683, 182, 115, 1, 36, "Subsection"],
+Cell[5801, 185, 185, 4, 29, "Text"],
+Cell[CellGroupData[{
+Cell[6011, 193, 243, 5, 52, "Input"],
+Cell[6257, 200, 91, 1, 30, "Output"],
+Cell[6351, 203, 102, 1, 30, "Output"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[6502, 210, 109, 1, 36, "Subsection"],
+Cell[6614, 213, 167, 3, 29, "Text"],
+Cell[6784, 218, 447, 13, 52, "Input"]
+}, Open  ]]
+}, Open  ]]
+}
+]
+*)
+
+(* End of internal cache information *)
