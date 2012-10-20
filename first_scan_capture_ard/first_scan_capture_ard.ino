@@ -1,5 +1,5 @@
 
-//#[ first_scan_capture_ard.ino ] kwp, 2012-10-19-1937
+//#[ first_scan_capture_ard.ino ] kwp, 2012-10-20-1346
 
 //##############################################################
 /*
@@ -16,9 +16,9 @@ int pin_se_preamp_read_raw          = A1; // Secondary Electron preamp
 int pin_beam_mon_read_raw           = A2; // Beam Monitor preamp
 void setup_analog_inputs()
 {
-//  pinMode( pin_video_read_raw,     INPUT );  // Might be importaint %TODO%
-//  pinMode( pin_se_preamp_read_raw, INPUT );  // Might be importaint %TODO%
-//  pinMode( pin_beam_mon_read_raw,  INPUT );  // Might be importaint %TODO%
+    pinMode( pin_video_read_raw,     INPUT );  // Might be importaint %TODO%
+    pinMode( pin_se_preamp_read_raw, INPUT );  // Might be importaint %TODO%
+    pinMode( pin_beam_mon_read_raw,  INPUT );  // Might be importaint %TODO%
 }
 
 // scan control outputs
@@ -154,7 +154,7 @@ void delay_ms( int ms )
 //##############################################################
 //##############################################################
 
-//#define USE_SCAN_X 1
+#define USE_SCAN_X 1
 
 #ifdef  USE_SCAN_X
 
