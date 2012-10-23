@@ -1,5 +1,5 @@
 
-//#[ first_scan_capture_ard.ino ] kwp, 2012-10-20-1346
+//#[ first_scan_capture_ard.ino ] kwp, 2012-10-20-1533
 
 //##############################################################
 /*
@@ -11,10 +11,11 @@ output it to the serial line to the computer.
 // Pin assignments
 
 // analog inputs
-int pin_video_read_raw              = A0; // console processed video
-int pin_se_preamp_read_raw          = A1; // Secondary Electron preamp
-int pin_beam_mon_read_raw           = A2; // Beam Monitor preamp
-void setup_analog_inputs()
+int     pin_video_read_raw              = A0; // console processed video
+int     pin_se_preamp_read_raw          = A1; // Secondary Electron preamp
+int     pin_beam_mon_read_raw           = A2; // Beam Monitor preamp
+void    setup_analog_inputs( void );
+void    setup_analog_inputs( void )
 {
     pinMode( pin_video_read_raw,     INPUT );  // Might be importaint %TODO%
     pinMode( pin_se_preamp_read_raw, INPUT );  // Might be importaint %TODO%
@@ -22,14 +23,20 @@ void setup_analog_inputs()
 }
 
 // scan control outputs
-int pin_scan_x                       =  9; // Sets out x position pin
-int pin_scan_y                       = 10; // This sets up out y position pin
+int     pin_scan_x                      =  9; // Sets out x position pin
+int     pin_scan_y                      = 10; // This sets up out y position pin
+void    setup_scan_outputs( void );
+void    setup_scan_outputs( void )
+{
+    pinMode( pin_scan_x, OUTPUT);       // declare the xPin as an PWM OUTPUT
+    pinMode( pin_scan_y, OUTPUT);       // declare the yPin as an PWM OUTPUT:
+}
 
 // blanking signal out
-      int pin_blanking               = 1; 
-const int pin_blanking_set_on_const  = LOW;
-const int pin_blanking_set_off_const = HIGH;
-void      pin_blanking_setup(   void ); 
+      int pin_blanking                  = 1; 
+const int pin_blanking_set_on_const     = LOW;
+const int pin_blanking_set_off_const    = HIGH;
+void      setup_blanking_outputs(   void ); 
 void      sig_blanking_set_on(  void );
 void      sig_blanking_set_off( void );
 
@@ -92,11 +99,10 @@ void do_print_csv_front( char * board_id_sz, char * rec_format_sz, int finish_re
 // int pin_beam_mon_read_raw           = A2; // Beam Monitor preamp
 // 
 //--------------------------------------------------------------
-// video_raw = video_read_raw(); // analogRead(pin_video_read_raw);
 
 int video_read_raw( void )
 {
-    return analogRead( pin_video_read_raw /* A0 */ ); // Arduino
+    return analogRead( pin_video_read_raw ); // Arduino
 }
 //--------------------------------------------------------------
 
@@ -112,11 +118,9 @@ int beam_mon_read_raw( void )
 }
 //##############################################################
 
-//    pin_blanking_setup();  // pinMode(      pin_blanking, OUTPUT );
-
-void  pin_blanking_setup(   void ) 
+void  sig_blanking_set_off( void )
 {
-	pinMode(      pin_blanking, OUTPUT ); // Arduino
+	digitalWrite( pin_blanking , pin_blanking_set_off_const ); // Arduino
 }
 //------------------------------
 
@@ -126,9 +130,10 @@ void  sig_blanking_set_on(  void )
 }
 //------------------------------
 
-void  sig_blanking_set_off( void )
+void  setup_blanking_outputs(   void ) 
 {
-	digitalWrite( pin_blanking , pin_blanking_set_off_const ); // Arduino
+	pinMode( pin_blanking, OUTPUT ); // Arduino
+    sig_blanking_set_on();
 }
 //##############################################################
 // scan_x_set( x ); //analogWrite(pin_scan_x, x); // Move the stage to x
@@ -152,11 +157,14 @@ void delay_ms( int ms )
 	delay( ms ); // Arduino
 }
 //##############################################################
+
+void setup_USB_serial( int bps );
+void setup_USB_serial( int bps )
+{
+    Serial.begin( bps );
+}
 //##############################################################
-
-#define USE_SCAN_X 1
-
-#ifdef  USE_SCAN_X
+//##############################################################
 
 void do_scan_x( void )
 {
@@ -164,32 +172,24 @@ void do_scan_x( void )
 
     for (int x = scan_x_start ; x <= scan_x_stop ; x +=scan_x_step)
         { // Inner loop (x)
-        scan_x_set( x );              // analogWrite(pin_scan_x, x); // Move the stage to x
-        delay_ms( settle_x_ms );      // delay(settle_x_ms); // Wait for the motion to settle
+        scan_x_set( x );                // analogWrite(pin_scan_x, x); // Move the stage to x
+        delay_ms( settle_x_ms );        // delay(settle_x_ms); // Wait for the motion to settle
         video_raw = video_read_raw();   // analogRead(pin_video_read_raw);
-        Serial.print(", ");           // Send the value to the computer
-        Serial.print( video_raw );  // Send the value to the computer
+        Serial.print(", ");             // Send the value to the computer
+        Serial.print( video_raw );      // Send the value to the computer
         }
 
     sig_blanking_set_on();
 }
-#endif // #ifdef USE_SCAN_X
-
 //==============================================================
-
-#define USE_SCAN_XY 1
-
-#ifdef  USE_SCAN_XY
 
 void do_scan_xy( void )
 {
-
     // This puts usinto the correct position, and settles before beginig our loop
-    scan_x_set( scan_x_start ); // analogWrite(pin_scan_x, scan_x_start);
-    scan_y_set( scan_y_start ); // analogWrite(pin_scan_y, scan_y_start);
+    scan_x_set( scan_x_start );
+    scan_y_set( scan_y_start );
 
-    delay_ms( settle_retrace_x_ms ); // delay(settle_retrace_x_ms);
-    delay_ms( settle_retrace_y_ms ); // delay(settle_retrace_y_ms);
+    delay_ms( max( settle_retrace_x_ms, settle_retrace_y_ms ) );
 
 #if 0
     do_calc_seconds_hexfrac_globals();
@@ -197,42 +197,25 @@ void do_scan_xy( void )
     Serial.print(", ");
     Serial.print( g_since_boot_sec_hexfrac_sz );
     Serial.print(", Board_ID, Rec_Null, \r\n");
-#else
-    do_print_csv_front(            "Board_ID-x", "Rec_Null-x", 1 );			
-//  Serial.print("Seconds, Hexfrac, Board_ID-x,   Rec_Null-x, \r\n");
 #endif
-    Serial.print("Seconds, Hexfrac, Board_ID, Rec_Null, \r\n"); 
-    Serial.print("Seconds, Hexfrac, Board_ID, Rec_Null, \r\n");
-    Serial.print("Seconds, Hexfrac, Board_ID, Rec_Scan_Start, \r\n");
+
+    do_print_csv_front( "Board_ID-x", "Rec_Null-x", 1 );
+    do_print_csv_front( "Board_ID-x", "Rec_Null-x", 1 );
+    do_print_csv_front( "Board_ID-x", "Rec_Null-x", 1 );
+
+    do_print_csv_front( "Board_ID-x", "Rec_Scan_Start", 1 );
 	
     for( int y = scan_y_start ; y <= scan_y_stop ; y +=scan_y_step )
         {  // Outer loop (y)
 
-#if 1
         do_print_csv_front( "temp_board_ID", "temp_rec_format", 0 );			
-   //     Serial.print("Seconds, Hexfrac, Board_ID, ");
-   //     Serial.print("Rec_Format, ");
         Serial.print(y);
         Serial.print(", Bloop"); // Send the value to the computer
-#endif
 
         scan_y_set( y );         // analogWrite(pin_scan_y, y); // Move the state to t
         delay_ms( settle_y_ms ); // delay(settle_y_ms);
 
-#ifdef         USE_SCAN_X
         do_scan_x();
-#else
-        sig_blanking_set_off();
-        for (int x = scan_x_start ; x <= scan_x_stop ; x +=scan_x_step)
-            { // Inner loop (x)
-            scan_x_set( x );                    // analogWrite(pin_scan_x, x); // Move the stage to x
-            delay_ms( settle_x_ms );            // delay(settle_x_ms); // Wait for the motion to settle
-            video_raw = video_read_raw();         // analogRead(pin_video_read_raw);
-            Serial.print(", ");                 // Send the value to the computer
-            Serial.print( video_raw );        // Send the value to the computer
-            }
-        sig_blanking_set_on();
-#endif // #ifdef #else USE_SCAN_X
 	
         Serial.print("\r\n");                   // Prints a new line when we move y
 		
@@ -240,82 +223,41 @@ void do_scan_xy( void )
         delay_ms( settle_retrace_x_ms );        // delay(settle_retrace_x_ms);
         }
 
-}
-#endif // #ifdef USE_SCAN_XY
+    do_print_csv_front( "Board_ID-x", "Rec_Scan_Complete", 1 );
+    do_print_csv_front( "Board_ID-x", "Rec_Null-x", 1 );
 
+}
 //##############################################################
 //##############################################################
 
 void setup() 
 {// This is treated as out main() function for now
-    pinMode(pin_scan_x, OUTPUT); // declare the xPin as an PWM OUTPUT
-    pinMode(pin_scan_y, OUTPUT); // declare the yPin as an PWM OUTPUT:
 
+    setup_USB_serial( 9600 );
+    setup_scan_outputs();
     setup_analog_inputs();
-//  pinMode(pin_video_read_raw, INPUT);  // Might be importaint %TODO%
-//int pin_se_preamp_read_raw               = A1; // Secondary Electron preamp
-//int pin_beam_mon_read_raw                = A2; // Beam Monitor preamp
 
-    pin_blanking_setup();  // pinMode(      pin_blanking, OUTPUT );
-    sig_blanking_set_on(); // digitalWrite( pin_blanking, pin_blanking_set_on_const   );
+    setup_blanking_outputs();  // pinMode(      pin_blanking, OUTPUT );
+//    sig_blanking_set_on(); // digitalWrite( pin_blanking, pin_blanking_set_on_const   );
 
-    Serial.begin(9600);  //Sets up a serial output to our computer at 9600 bps
+    delay_ms( settle_initial_ms );
 
-    delay_ms( settle_initial_ms ); // delay(settle_initial_ms); // Wait an initial ammount of time before starting
+    do_print_csv_front( "Board_ID-x", "Rec_Null-x", 1 );
+    do_print_csv_front( "Board_ID-x", "Rec_Null-x", 1 );
+    do_print_csv_front( "Board_ID-x", "Rec_Null-x", 1 );
 
-#ifdef USE_SCAN_XY
+    scan_x_set( scan_x_start );
+    scan_y_set( scan_y_start );
+
     do_scan_xy();
-#else
-    // This puts usinto the correct position, and settles before beginig our loop
-    scan_x_set( scan_x_start ); // analogWrite(pin_scan_x, scan_x_start);
-    scan_y_set( scan_y_start ); // analogWrite(pin_scan_y, scan_y_start);
 
-    delay_ms( settle_retrace_x_ms ); // delay(settle_retrace_x_ms);
-    delay_ms( settle_retrace_y_ms ); // delay(settle_retrace_y_ms);
-	
-    Serial.print("Seconds, Hexfrac, Board_ID, Rec_Null, \r\n");
-    Serial.print("Seconds, Hexfrac, Board_ID, Rec_Null, \r\n"); 
-    Serial.print("Seconds, Hexfrac, Board_ID, Rec_Null, \r\n");
-    Serial.print("Seconds, Hexfrac, Board_ID, Rec_Scan_Start, \r\n");
+    scan_x_set( scan_x_start );
+    scan_y_set( scan_y_start );
 
-    for( int y = scan_y_start ; y <= scan_y_stop ; y +=scan_y_step )
-        {  // Outer loop (y)
-			
-        Serial.print("Seconds, "); 
-        Serial.print("Hexfrac, "); 
-        Serial.print("Board_ID, ");
-        Serial.print("Rec_Format, ");
-        Serial.print(y);
-        Serial.print(", Bloop"); // Send the value to the computer
-		
-        scan_y_set( y );         // analogWrite(pin_scan_y, y); // Move the state to t
-        delay_ms( settle_y_ms ); // delay(settle_y_ms);
-		
-        sig_blanking_set_off();
-        for (int x = scan_x_start ; x <= scan_x_stop ; x +=scan_x_step)
-            { // Inner loop (x)
-            scan_x_set( x );            // analogWrite(pin_scan_x, x); // Move the stage to x
-            delay_ms( settle_x_ms );    // delay(settle_x_ms); // Wait for the motion to settle
-            video_raw = video_read_raw(); // analogRead(pin_video_read_raw);
-            Serial.print(", ");         // Send the value to the computer
-            Serial.print(video_raw);  // Send the value to the computer
-            }
-        sig_blanking_set_on();
-		
-        Serial.print("\r\n");  // Prints a new line when we move y
-		
-        scan_x_set( scan_x_start );      // analogWrite(pin_scan_x, scan_x_start);
-        delay_ms( settle_retrace_x_ms ); // delay(settle_retrace_x_ms);
-        }
-#endif // #ifndef #else USE_SCAN_XY
+    do_print_csv_front( "Board_ID-x", "Rec_Null-x", 1 );
+    do_print_csv_front( "Board_ID-x", "Rec_Null-x", 1 );
+    do_print_csv_front( "Board_ID-x", "Rec_Null-x", 1 );
 
-    Serial.print("Seconds, Hexfrac, Board_ID, Rec_Scan_Complete, \r\n");
-    Serial.print("Seconds, Hexfrac, Board_ID, Rec_Null, \r\n");
-    Serial.print("Seconds, Hexfrac, Board_ID, Rec_Null, \r\n"); 
-    Serial.print("Seconds, Hexfrac, Board_ID, Rec_Null, \r\n");
-
-    scan_y_set( scan_y_start );      // analogWrite(pin_scan_y, scan_y_start);
-    delay_ms( settle_retrace_y_ms ); // delay_ms( settle_retrace_y_ms ); // delay(settle_retrace_y_ms);
 }
 //##############################################################
 void loop() 
