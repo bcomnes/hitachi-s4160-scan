@@ -1,5 +1,9 @@
 
-//#[ first_scan_capture_ard.ino ] kwp, 2012-10-20-1533
+//#[ first_scan_capture_ard.ino ] kwp, 2012-10-21-0825
+
+#define SQUARE_ARRAY_SIDE 256
+
+#define CSV_BOARD_ID     id_woof
 
 //##############################################################
 /*
@@ -36,29 +40,55 @@ void    setup_scan_outputs( void )
       int pin_blanking                  = 1; 
 const int pin_blanking_set_on_const     = LOW;
 const int pin_blanking_set_off_const    = HIGH;
-void      setup_blanking_outputs(   void ); 
-void      sig_blanking_set_on(  void );
-void      sig_blanking_set_off( void );
+void      setup_blanking_outputs( void ); 
+void      sig_blanking_set_on(    void );
+void      sig_blanking_set_off(   void );
 
 //------------------------------
 // Variables
 
 volatile int video_raw           =   0; // Initializing our sensor value variable
 
+//------------------------------
+// AWG -- Arbitrary Waveform Generation, for now, rotation
+//        scan_x_set( awg_x[ x ] );j
+#define        SIZE_AWG         SQUARE_ARRAY_SIDE
+int     awg_x[ SIZE_AWG ];
+int     awg_y[ SIZE_AWG ];
+void setup_awg_default( void );
+void setup_awg_default( void )
+{
+    for( int i=0 ; i<SIZE_AWG ; i++ )
+        { // setup a default of data equals index
+        awg_x[ i ] = i;
+        awg_y[ i ] = i;
+        }
+}
+void awg_calculate( int raster_y, float theta );
+void awg_calculate( int raster_y, float theta ) //TODO:kwp: make work
+{
+    for( int i=0 ; i<SIZE_AWG ; i++ )
+        { // setup a DUMMY of data equals index
+        awg_x[ i ] = i;
+        awg_y[ i ] = i;
+        }
+}
+const float   theta_zero = 0.0;
+//------------------------------
+
 // scan control
-volatile int scan_x_start        =   0; // PWM x initial value
-volatile int scan_y_start        =   0; // PWM y initial value
-volatile int scan_x_stop         = 255; // PWM x final value
-volatile int scan_y_stop         =  10; // PWM y final value
-volatile int scan_x_step         =   1; // x step size
-volatile int scan_y_step         =   1; // y step size
+//volatile int scan_x_start        =        0; // PWM x initial value
+//volatile int scan_y_start        =        0; // PWM y initial value
+//volatile int scan_x_stop         = SQUARE_ARRAY_SIDE; // PWM x final value
+//volatile int scan_y_stop         = SQUARE_ARRAY_SIDE; // PWM y final value
+//volatile int scan_x_step         =        1; // x step size
+//volatile int scan_y_step         =        1; // y step size
 //
 volatile int settle_initial_ms   =   1; // This allows us to delay out program from running
 volatile int settle_x_ms         =   1; // This is the settle time after each xy pos. change
 volatile int settle_y_ms         =   1; // This is the settle time after each xy pos. change
 volatile int settle_retrace_x_ms =   1; // retrace settle time x
 volatile int settle_retrace_y_ms =   1; // retrace settle time y
-
 
 //##############################################################
 
@@ -166,28 +196,38 @@ void setup_USB_serial( int bps )
 //##############################################################
 //##############################################################
 
-void do_scan_x( void )
+void do_raster_scan_x( int raster_y )
 {
     sig_blanking_set_off();
 
-    for (int x = scan_x_start ; x <= scan_x_stop ; x +=scan_x_step)
+    for( int raster_x = 0 ; raster_x < SQUARE_ARRAY_SIDE ; raster_x++ )
         { // Inner loop (x)
-        scan_x_set( x );                // analogWrite(pin_scan_x, x); // Move the stage to x
-        delay_ms( settle_x_ms );        // delay(settle_x_ms); // Wait for the motion to settle
-        video_raw = video_read_raw();   // analogRead(pin_video_read_raw);
-        Serial.print(", ");             // Send the value to the computer
-        Serial.print( video_raw );      // Send the value to the computer
+#if 1
+        scan_x_set( awg_x[ raster_x ] );
+        scan_y_set( awg_y[ raster_y ] );
+#else
+        scan_x_set( raster_x );
+        scan_y_set( raster_y );
+#endif
+
+        delay_ms( settle_x_ms );
+
+        // get data and add to horiz. scan record
+        video_raw = video_read_raw();
+        Serial.print(", ");
+        Serial.print( video_raw );
         }
 
     sig_blanking_set_on();
 }
 //==============================================================
 
-void do_scan_xy( void )
+void do_raster_scan_xy( float theta )
 {
+
     // This puts usinto the correct position, and settles before beginig our loop
-    scan_x_set( scan_x_start );
-    scan_y_set( scan_y_start );
+//    scan_x_set( scan_x_start );
+//    scan_y_set( scan_y_start );
 
     delay_ms( max( settle_retrace_x_ms, settle_retrace_y_ms ) );
 
@@ -199,72 +239,82 @@ void do_scan_xy( void )
     Serial.print(", Board_ID, Rec_Null, \r\n");
 #endif
 
-    do_print_csv_front( "Board_ID-x", "Rec_Null-x", 1 );
-    do_print_csv_front( "Board_ID-x", "Rec_Null-x", 1 );
-    do_print_csv_front( "Board_ID-x", "Rec_Null-x", 1 );
-
-    do_print_csv_front( "Board_ID-x", "Rec_Scan_Start", 1 );
 	
-    for( int y = scan_y_start ; y <= scan_y_stop ; y +=scan_y_step )
+    for( int raster_y = 0 ; raster_y < SQUARE_ARRAY_SIDE ; raster_y++ )
         {  // Outer loop (y)
+     // awg_calculate( int raster_y, float theta );
+        awg_calculate(     raster_y, theta );
 
-        do_print_csv_front( "temp_board_ID", "temp_rec_format", 0 );			
-        Serial.print(y);
-        Serial.print(", Bloop"); // Send the value to the computer
+        // output front of the horizontal scan line CSV record
+        do_print_csv_front( "CSV_BOARD_ID", "temp_rec_format", 0 );			
+        Serial.print( raster_y );
+        Serial.print(", ##");
 
-        scan_y_set( y );         // analogWrite(pin_scan_y, y); // Move the state to t
-        delay_ms( settle_y_ms ); // delay(settle_y_ms);
-
-        do_scan_x();
+        do_raster_scan_x( raster_y );
 	
-        Serial.print("\r\n");                   // Prints a new line when we move y
+        // output end of the horizontal scan line CSV record
+        Serial.print("\r\n");
 		
-        scan_x_set( scan_x_start );             // analogWrite(pin_scan_x, scan_x_start);
+//        scan_x_set( scan_x_start );             // analogWrite(pin_scan_x, scan_x_start);
         delay_ms( settle_retrace_x_ms );        // delay(settle_retrace_x_ms);
         }
-
-    do_print_csv_front( "Board_ID-x", "Rec_Scan_Complete", 1 );
-    do_print_csv_front( "Board_ID-x", "Rec_Null-x", 1 );
-
 }
 //##############################################################
 //##############################################################
 
-void setup() 
-{// This is treated as out main() function for now
+void    do_it( float theta )
+{
+    delay_ms( settle_initial_ms );
+
+    do_print_csv_front( "CSV_BOARD_ID", "Rec_Null-x", 1 );
+    do_print_csv_front( "CSV_BOARD_ID", "Rec_Null-x", 1 );
+    do_print_csv_front( "CSV_BOARD_ID", "Rec_Null-x", 1 );
+
+    do_print_csv_front( "CSV_BOARD_ID", "Rec_Scan_Start",    1 );
+    do_raster_scan_xy( theta );
+    do_print_csv_front( "CSV_BOARD_ID", "Rec_Scan_Complete", 1 );
+
+    do_print_csv_front( "CSV_BOARD_ID", "Rec_Null-x", 1 );
+    do_print_csv_front( "CSV_BOARD_ID", "Rec_Null-x", 1 );
+    do_print_csv_front( "CSV_BOARD_ID", "Rec_Null-x", 1 );
+}
+//##############################################################
+//##############################################################
+
+void our_setup() //TODO: move out of Arduino .ino file
+{// This is treated as our main() function for now
 
     setup_USB_serial( 9600 );
     setup_scan_outputs();
     setup_analog_inputs();
 
-    setup_blanking_outputs();  // pinMode(      pin_blanking, OUTPUT );
-//    sig_blanking_set_on(); // digitalWrite( pin_blanking, pin_blanking_set_on_const   );
+    setup_blanking_outputs();
+    setup_awg_default();
 
-    delay_ms( settle_initial_ms );
-
-    do_print_csv_front( "Board_ID-x", "Rec_Null-x", 1 );
-    do_print_csv_front( "Board_ID-x", "Rec_Null-x", 1 );
-    do_print_csv_front( "Board_ID-x", "Rec_Null-x", 1 );
-
-    scan_x_set( scan_x_start );
-    scan_y_set( scan_y_start );
-
-    do_scan_xy();
-
-    scan_x_set( scan_x_start );
-    scan_y_set( scan_y_start );
-
-    do_print_csv_front( "Board_ID-x", "Rec_Null-x", 1 );
-    do_print_csv_front( "Board_ID-x", "Rec_Null-x", 1 );
-    do_print_csv_front( "Board_ID-x", "Rec_Null-x", 1 );
-
+    do_it( theta_zero );
 }
 //##############################################################
-void loop() 
+
+void our_loop() //TODO: move out of Arduino .ino file
 {
 // When the data is collected, stop everything.
 // Press reset on the computer if you want to run again.
 
+}
+
+//##############################################################
+//##############################################################
+//##############################################################
+
+void setup() // Arduino MANDATED name function
+{
+    our_setup();
+}
+//--------------------------------------------------------------
+
+void loop() // Arduino MANDATED name function
+{
+    our_loop();
 }
 
 //##############################################################
