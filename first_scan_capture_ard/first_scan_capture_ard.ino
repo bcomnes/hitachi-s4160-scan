@@ -42,9 +42,9 @@ volatile int video_raw           =   0; // Initializing our sensor value variabl
 volatile int scan_x_start        =   0; // PWM x initial value
 volatile int scan_y_start        =   0; // PWM y initial value
 volatile int scan_x_stop         = 255; // PWM x final value
-volatile int scan_y_stop         =  10; // PWM y final value
-volatile int scan_x_step         =   1; // x step size
-volatile int scan_y_step         =   1; // y step size
+volatile int scan_y_stop         = 255; // PWM y final value
+volatile int scan_x_step         =  8; // x step size
+volatile int scan_y_step         =  8; // y step size
 //
 volatile int settle_initial_ms   =   1; // This allows us to delay out program from running
 volatile int settle_x_ms         =   1; // This is the settle time after each xy pos. change
