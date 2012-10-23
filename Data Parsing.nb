@@ -1,0 +1,204 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 8.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       157,          7]
+NotebookDataLength[      7795,        195]
+NotebookOptionsPosition[      7274,        172]
+NotebookOutlinePosition[      7610,        187]
+CellTagsIndexPosition[      7567,        184]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[BoxData[
+ RowBox[{"SetDirectory", "[", 
+  RowBox[{"NotebookDirectory", "[", "]"}], "]"}]], "Input",
+ InitializationCell->True],
+
+Cell[BoxData["\<\"/Users/bret/Documents/Nanophysics/hitatchi-s4160-scan\"\>"],\
+ "Output",
+ CellChangeTimes->{{3.559757551223353*^9, 3.559757551353901*^9}}]
+}, Open  ]],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"data", "=", 
+   RowBox[{"Evaluate", "[", 
+    RowBox[{"Import", "[", "\"\<Data/data.sample.csv\>\"", "]"}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"dropmeta", "[", "data_", "]"}], ":=", 
+   RowBox[{"Drop", "[", 
+    RowBox[{
+     RowBox[{"Drop", "[", 
+      RowBox[{
+       RowBox[{"Drop", "[", 
+        RowBox[{"data", ",", 
+         RowBox[{"-", "4"}]}], "]"}], ",", "4"}], "]"}], ",", "None", ",", 
+     "4"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"raw", "=", 
+   RowBox[{"dropmeta", "[", "data", "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"rawnormal", "=", 
+   RowBox[{"Evaluate", "[", 
+    RowBox[{"raw", "/", 
+     RowBox[{"Max", "[", "raw", "]"}]}], "]"}]}], ";"}]}], "Input",
+ CellChangeTimes->{{3.559757878132004*^9, 3.559757889587072*^9}, {
+  3.55975814795208*^9, 3.559758148560762*^9}, {3.559758216661255*^9, 
+  3.559758221090355*^9}, {3.5597584318996468`*^9, 3.559758456707674*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"TableForm", "[", "data", "]"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{"TableForm", "[", "raw", "]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"TableForm", "[", "rawnormal", "]"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{"Image", "[", "rawnormal", "]"}]}], "Input",
+ CellChangeTimes->{{3.559757784173521*^9, 3.559757828599751*^9}, {
+  3.55975789460741*^9, 3.559757895335286*^9}, {3.559758151669478*^9, 
+  3.559758160845646*^9}, {3.5597582021550903`*^9, 3.5597582284654903`*^9}, {
+  3.559758460148052*^9, 3.559758486574862*^9}, {3.5597587754058027`*^9, 
+  3.55975877797014*^9}, {3.559758832883403*^9, 3.559758837147582*^9}, {
+  3.559758979257564*^9, 3.5597589885983267`*^9}, {3.559760476546377*^9, 
+  3.559760488857892*^9}}],
+
+Cell[BoxData[
+ TagBox[GridBox[{
+    {"19", "19", "22", "28", "35", "44", "53", "63", "75", "85", "97", "108", 
+     "127", "137", "155", "166"},
+    {"33", "45", "47", "46", "49", "54", "62", "70", "79", "89", "100", "117",
+      "126", "144", "155", "171"},
+    {"36", "40", "38", "40", "45", "52", "61", "72", "84", "95", "106", "116",
+      "134", "144", "162", "173"},
+    {"41", "53", "55", "54", "57", "63", "70", "79", "88", "99", "109", "126",
+      "136", "155", "166", "182"},
+    {"48", "52", "50", "52", "57", "65", "75", "86", "97", "108", "118", 
+     "136", "145", "163", "174", "190"},
+    {"57", "60", "58", "61", "65", "75", "84", "96", "106", "117", "133", 
+     "141", "160", "170", "187", "198"},
+    {"66", "79", "80", "80", "83", "88", "96", "105", "119", "128", "145", 
+     "153", "172", "182", "198", "210"},
+    {"77", "78", "78", "81", "88", "97", "107", "116", "132", "139", "159", 
+     "166", "184", "195", "211", "222"},
+    {"89", "89", "89", "95", "101", "108", "122", "129", "147", "153", "172", 
+     "180", "197", "209", "221", "235"},
+    {"103", "114", "111", "112", "120", "124", "138", "143", "160", "169", 
+     "185", "196", "208", "223", "233", "249"},
+    {"117", "124", "123", "124", "133", "137", "151", "159", "173", "185", 
+     "197", "211", "220", "238", "249", "264"},
+    {"131", "135", "135", "137", "146", "153", "164", "175", "185", "200", 
+     "208", "226", "235", "253", "264", "280"},
+    {"146", "146", "148", "150", "159", "169", "176", "192", "198", "217", 
+     "224", "243", "252", "268", "280", "292"},
+    {"161", "158", "160", "167", "171", "185", "190", "207", "213", "230", 
+     "240", "255", "268", "280", "295", "307"},
+    {"176", "188", "192", "193", "194", "204", "208", "223", "233", "246", 
+     "258", "268", "284", "294", "310", "322"},
+    {"191", "203", "205", "207", "207", "218", "226", "237", "249", "258", 
+     "274", "282", "300", "310", "326", "338"}
+   },
+   GridBoxAlignment->{
+    "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+     "RowsIndexed" -> {}},
+   GridBoxSpacings->{"Columns" -> {
+       Offset[0.27999999999999997`], {
+        Offset[2.0999999999999996`]}, 
+       Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+       Offset[0.2], {
+        Offset[0.4]}, 
+       Offset[0.2]}, "RowsIndexed" -> {}}],
+  Function[BoxForm`e$, 
+   TableForm[BoxForm`e$]]]], "Output",
+ CellChangeTimes->{
+  3.5597587891044807`*^9, {3.55975883345979*^9, 3.5597588376971083`*^9}, {
+   3.559758983652432*^9, 3.55975898914587*^9}, {3.5597604768663597`*^9, 
+   3.559760489541716*^9}}],
+
+Cell[BoxData[
+ GraphicsBox[
+  TagBox[RasterBox[CompressedData["
+1:eJx1VQlsVFUULagYFaShoBgQxIALLuAOKXpcMCBEgsiSKqQEQlBRrEIw4kbE
+BYILEBRUUFmqEImyagWBTmk7rG2ZdjoznXY68/9Mh64gVQMRje++d9/9SRsn
+M3n5f/57557l3j9o1suT5nTNyMjI5N/3j+5JtPu3w64j3GcGb922A13nTl9x
+6X17UbTknh8ff3cf3y9Ez27rX7mjVzGcdn///KgfP7x2dGmXuSdwaNfitaP6
+VmDLwr+PNc0I4KpTH5QPXFCF3JwD4wd0D+OJiU8PqjkbwQ0L1szPzanDh+rf
+NfPrUTV52f1v/luAexXKl1f6MHR0v4feOeHDsNeHxz+a54PadGH2J0V8XjEa
+bqk7uGuxn+s6hi82E+BJ/DyWACpwfX502tQzASyadbP6VnOdIfx6zRUvDB0d
+Ffy35/x5p4Lg+/tBdw+MP8g6/CbXtq7e2TuzsnceRvOMczMLr/PzvuNQf6rK
+yrF1W+ZL5y+eYn2qcP7iXWMa/wqigmjmRgR/5chxv/y0PQZS6dzMOJTIfTb1
+OCS6mu3FwvcfOuazEtG7I2/jSwW+0coEQGqu21wlvI8TTGFn3YlNVnYCN2ng
+IuFn9POuLX5k+Ybw8g1HxO8H++aV7h3b2e8/CHZateA+QOUsjOJqXWAM+94i
+4eOsV0LOP7P68kvKCkpZtxLRuSOu1dvUHRC9rd+TNEAED+ug1LCPMc5nHC+u
++vY7ZTHr5XD+joie5vkyWY1e5aKzxTXHVOJVBT55WTUolWtHhYXvYE2wlnWK
+i94W1+x3sakH3TmJr8NE1FtNTsoE1+r88Tza6eXL1B+GbpunanAtxaxfTHw2
+fZSAlmeRA92GF1y814UaPCV903G1ef6K5B5YKf4aX0J4VhMM426yL9iZr+mb
+BBS4KthBZettykIXJRNaiie0JEGpV8zxeXB/0rekknMQ5LqCPH+CnItq7vsQ
+1OFUIHQ8s6Lib4b+xNFGMEsTPDcczrGLx6it+6dAzTekZwN0zFenJTf2/OcP
+pz8dOS4k1zZPdn7dqo2uFZ1tH1tcy9fqbOKZ5Jx4uMa305iqCYbx5PvPKeSI
+rBZPl53v6WvmRT20ras8XNO3Hl8VBlV5SnTeSHFr93DNHGmS8+26g+TpVsv9
+5vG0+po8xrkPHMkzPT19RZJ9S+F2fUCa51Ca52BjB9xm9NIFxbj/6sTPy3Th
+9TKnLU87N6boQeeirIAGaxJvqO7OK01xXhowoDtVeroT7u8qFYHWZmgama3C
+x7x3EsIr5aMNDvedAx3rie7/5snkJs194eHS22+E28R90sxzuJV5t0HL1cdB
+jnkQoRsfURFwhZ9dzVxPiq+7aZzleXmyuCY3jTz/mtjHFsE1c7iN/TyL/wCK
+9Ae+
+    "], {{0, 16}, {16, 0}}, {0., 1.},
+    ColorFunction->GrayLevel],
+   BoxForm`ImageTag["Real", ColorSpace -> Automatic, Interleaving -> None],
+   Selectable->False],
+  BaseStyle->"ImageGraphics",
+  ImageSize->{622., 622.},
+  ImageSizeRaw->{16, 16},
+  PlotRange->{{0, 16}, {0, 16}}]], "Output",
+ CellChangeTimes->{
+  3.5597587891044807`*^9, {3.55975883345979*^9, 3.5597588376971083`*^9}, {
+   3.559758983652432*^9, 3.55975898914587*^9}, {3.5597604768663597`*^9, 
+   3.559760489547575*^9}}]
+}, Open  ]]
+},
+WindowSize->{887, 794},
+WindowMargins->{{4, Automatic}, {Automatic, 4}},
+FrontEndVersion->"8.0 for Mac OS X x86 (32-bit) (October 5, 2011)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[579, 22, 131, 3, 27, "Input",
+ InitializationCell->True],
+Cell[713, 27, 156, 2, 27, "Output"]
+}, Open  ]],
+Cell[884, 32, 1006, 27, 73, "Input"],
+Cell[CellGroupData[{
+Cell[1915, 63, 767, 14, 73, "Input"],
+Cell[2685, 79, 2606, 50, 281, "Output"],
+Cell[5294, 131, 1964, 38, 637, "Output"]
+}, Open  ]]
+}
+]
+*)
+
+(* End of internal cache information *)
