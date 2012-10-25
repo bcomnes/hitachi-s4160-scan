@@ -291,7 +291,7 @@ void our_setup() //TODO: move out of Arduino .ino file
     setup_blanking_outputs();
     setup_awg_default();
 
-    do_it( theta_zero );
+//    do_it( theta_zero );
 }
 //##############################################################
 
@@ -299,6 +299,8 @@ void our_loop() //TODO: move out of Arduino .ino file
 {
 // When the data is collected, stop everything.
 // Press reset on the computer if you want to run again.
+
+      do_it( theta_zero );
 
 }
 
