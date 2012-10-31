@@ -44,6 +44,14 @@ void      setup_blanking_outputs( void );
 void      sig_blanking_set_on(    void );
 void      sig_blanking_set_off(   void );
 
+// relay signal out
+      int pin_relay                     = 2; 
+const int pin_relay_set_on_const     = HIGH;
+const int pin_relay_set_off_const    = LOW;
+void      setup_relay_outputs( void ); 
+void      sig_relay_set_on(    void );
+void      sig_relay_set_off(   void );
+
 //------------------------------
 // Variables
 
@@ -84,7 +92,7 @@ const float   theta_zero = 0.0;
 //volatile int scan_x_step         =        1; // x step size
 //volatile int scan_y_step         =        1; // y step size
 //
-volatile int settle_initial_ms   =   1; // This allows us to delay out program from running
+volatile int settle_relay_ms     = 100; // This allows us to delay out program from running
 volatile int settle_x_ms         =   1; // This is the settle time after each xy pos. change
 volatile int settle_y_ms         =   1; // This is the settle time after each xy pos. change
 volatile int settle_retrace_x_ms =   1; // retrace settle time x
@@ -164,6 +172,25 @@ void  setup_blanking_outputs(   void )
 {
 	pinMode( pin_blanking, OUTPUT ); // Arduino
     sig_blanking_set_on();
+}
+//##############################################################
+
+void  sig_relay_set_off( void )
+{
+	digitalWrite( pin_relay , pin_relay_set_off_const ); // Arduino
+}
+//------------------------------
+
+void  sig_relay_set_on(  void )
+{
+	digitalWrite( pin_relay , pin_relay_set_on_const ); // Arduino
+}
+//------------------------------
+
+void  setup_relay_outputs(   void ) 
+{
+	pinMode( pin_relay, OUTPUT ); // Arduino
+    sig_relay_set_on();
 }
 //##############################################################
 // scan_x_set( x ); //analogWrite(pin_scan_x, x); // Move the stage to x
@@ -264,7 +291,9 @@ void do_raster_scan_xy( float theta )
 
 void    do_it( float theta )
 {
-    delay_ms( settle_initial_ms );
+    sig_relay_set_on();
+
+    delay_ms( settle_relay_ms );
 
     do_print_csv_front( "CSV_BOARD_ID", "Rec_Null-x", 1 );
     do_print_csv_front( "CSV_BOARD_ID", "Rec_Null-x", 1 );
@@ -277,6 +306,8 @@ void    do_it( float theta )
     do_print_csv_front( "CSV_BOARD_ID", "Rec_Null-x", 1 );
     do_print_csv_front( "CSV_BOARD_ID", "Rec_Null-x", 1 );
     do_print_csv_front( "CSV_BOARD_ID", "Rec_Null-x", 1 );
+
+    sig_relay_set_off();
 }
 //##############################################################
 //##############################################################
@@ -291,6 +322,8 @@ void our_setup() //TODO: move out of Arduino .ino file
     setup_blanking_outputs();
     setup_awg_default();
 
+    setup_relay_outputs();
+
 //    do_it( theta_zero );
 }
 //##############################################################
@@ -301,6 +334,7 @@ void our_loop() //TODO: move out of Arduino .ino file
 // Press reset on the computer if you want to run again.
 
       do_it( theta_zero );
+      delay_ms( 1000 );
 
 }
 
