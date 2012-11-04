@@ -1,0 +1,5 @@
+General board info
+http://www.arduino.cc/en/Main/ArduinoBoardDuemilanove
+
+FTDI Driver
+http://www.ftdichip.com/Drivers/VCP.htm
