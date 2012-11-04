@@ -93,10 +93,10 @@ const float   theta_zero = 0.0;
 //volatile int scan_y_step         =        1; // y step size
 //
 volatile int settle_relay_ms     = 100; // This allows us to delay out program from running
-volatile int settle_x_ms         =   1; // This is the settle time after each xy pos. change
-volatile int settle_y_ms         =   1; // This is the settle time after each xy pos. change
-volatile int settle_retrace_x_ms =   1; // retrace settle time x
-volatile int settle_retrace_y_ms =   1; // retrace settle time y
+volatile int settle_x_ms         =  10; // This is the settle time after each xy pos. change
+volatile int settle_y_ms         =  10; // This is the settle time after each xy pos. change
+volatile int settle_retrace_x_ms =  20; // retrace settle time x
+volatile int settle_retrace_y_ms =  20; // retrace settle time y
 
 //##############################################################
 
@@ -123,8 +123,11 @@ void do_print_csv_front( char * board_id_sz, char * rec_format_sz, int finish_re
     Serial.print( g_since_boot_seconds );
     Serial.print(", ");
     Serial.print( g_since_boot_sec_hexfrac_sz );
-    Serial.print(", " );
+    Serial.print(",, " );
+    Serial.print( board_id_sz );
+    Serial.print(",, " );
     Serial.print( rec_format_sz );
+	Serial.print(",, " );
     if( finish_record )
         {
         Serial.print( "\r\n");
@@ -190,7 +193,7 @@ void  sig_relay_set_on(  void )
 void  setup_relay_outputs(   void ) 
 {
 	pinMode( pin_relay, OUTPUT ); // Arduino
-    sig_relay_set_on();
+    sig_relay_set_off();
 }
 //##############################################################
 // scan_x_set( x ); //analogWrite(pin_scan_x, x); // Move the stage to x
@@ -273,7 +276,7 @@ void do_raster_scan_xy( float theta )
         awg_calculate(     raster_y, theta );
 
         // output front of the horizontal scan line CSV record
-        do_print_csv_front( "CSV_BOARD_ID", "temp_rec_format", 0 );			
+        do_print_csv_front( "CSV_BOARD_ID", "temp_rec_formt", 0 );			
         Serial.print( raster_y );
         Serial.print(", ##");
 
@@ -315,7 +318,7 @@ void    do_it( float theta )
 void our_setup() //TODO: move out of Arduino .ino file
 {// This is treated as our main() function for now
 
-    setup_USB_serial( 9600 );
+    setup_USB_serial( 28800 );
     setup_scan_outputs();
     setup_analog_inputs();
 
@@ -332,9 +335,25 @@ void our_loop() //TODO: move out of Arduino .ino file
 {
 // When the data is collected, stop everything.
 // Press reset on the computer if you want to run again.
+int char_in;
+  
+      // send data only when you receive data:
+      if (Serial.available() > 0) 
+          {
+          // read the incoming byte:
+          char_in = Serial.read();
 
-      do_it( theta_zero );
-      delay_ms( 1000 );
+          switch( char_in )
+              {
+              case 'g':
+                  do_it( theta_zero );
+                  break ;
+
+              default:
+                  Serial.print("unexpected: ");
+                  Serial.println(char_in, DEC);
+              }
+          }
 
 }
 
