@@ -1,4 +1,4 @@
-hitatchi-scan
+hitachi-scan
 =============
 
-This is the readme for the hitatchi-s4160-scan modernization project that still needs writing.
+This is the readme for the hitachi-s4160-scan modernization project that still needs writing.
